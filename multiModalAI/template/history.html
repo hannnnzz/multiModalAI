@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include 'fragments/head.html' %}
+</head>
+<body>
+
+    {% include 'fragments/navbar.html' %}
+
+    <!-- RIWAYAT DETEKSI -->
+    <div class="container mt-5">
+        <h2 class="text-center text-primary fw-bold">🗂️ Riwayat Deteksi</h2>
+        
+        {% if img %}
+            <div class="d-flex flex-wrap justify-content-center gap-4 mt-4">
+                {% for p in img %}
+                    <div class="card shadow-sm position-relative text-center p-3" style="width: 22rem; border-radius: 10px;">
+                        <img src="{{ p.pic.url }}" class="card-img-top img-thumbnail" alt="Uploaded Image" 
+                            style="max-height: 220px; object-fit: cover; border-radius: 10px;">
+                        
+                        <div class="card-body">
+                            <p class="fw-bold text-muted">Deteksi: {{ p.disease_name|default:"-" }}</p>
+                            
+                            <!-- Tombol Detail -->
+                            <a href="{% url 'detail' p.id %}" class="btn btn-info btn-sm px-3">
+                                🔍 Detail
+                            </a>
+
+                            <!-- Tombol Hapus -->
+                            <form method="post" action="{% url 'delete' p.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm px-3" 
+                                        onclick="return confirm('Yakin ingin menghapus gambar ini?')">
+                                    ❌ Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-muted mt-4">Belum ada gambar yang diunggah.</p>
+        {% endif %}
+    </div>
+
+    {% include 'fragments/footer.html' %}
+
+</body>
+</html>

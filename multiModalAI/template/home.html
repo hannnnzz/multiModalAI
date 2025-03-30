@@ -1,22 +1,58 @@
 <!DOCTYPE html>
-{% load static %}
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    {% include 'fragments/head.html' %}
 </head>
 <body>
-    <h1>Hello {{request.user}}</h1>
-    <a href="/signout/">signout</a><br>
-    <form method="post" action="/upload/" enctype="multipart/form-data">
-        {% csrf_token %}
-        upload your profile pic<br><input type="file" name="pic" accept="Image/*"><br>
-        <button type="submit">upload</button>
-    </form>
-    {% for p in img %}
-    <img src="/media/{{p.pic}}"><br>
-    {% endfor %}
+
+    {% include 'fragments/navbar.html' %}
+    
+    <!-- FITUR UTAMA -->
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Fitur Utama Chill(i) AI</h2>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h5><strong>Login & Register</strong></h5>
+                    <p>Sistem autentikasi user.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h5><strong>Upload Gambar</strong></h5>
+                    <p>Unggah gambar daun & buah cabai.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h5><strong>Deteksi Penyakit</strong></h5>
+                    <p>Analisis AI untuk penyakit cabai.</p>
+                </div>
+            </div>
+        </div>
+        <div class="row text-center mt-3">
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h5><strong>Rekomendasi Pengobatan</strong></h5>
+                    <p>Saran pestisida & perawatan.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h5><strong>Riwayat Deteksi</strong></h5>
+                    <p>Melihat hasil deteksi sebelumnya.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-box">
+                    <h5><strong>Dashboard Visualisasi</strong></h5>
+                    <p>Diagram perbandingan data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'fragments/footer.html' %}
+
 </body>
 </html>

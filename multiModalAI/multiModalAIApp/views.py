@@ -1,12 +1,25 @@
-from django.shortcuts import render,redirect
+import os
+import base64
+import datetime
+from io import BytesIO
+from django.conf import settings
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import login,logout,authenticate
-from .models import profilepic
+from django.contrib import messages
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+from .models import UploadedImage
+from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import default_storage
+
 # Create your views here.
 
 def home(request):
     if request.user.is_authenticated:
-        pr=profilepic.objects.all().filter(user=request.user)
+        pr=UploadedImage.objects.all().filter(user=request.user)
         c={"img":pr}
         return render(request,"home.html",context=c)
     else:
@@ -16,47 +29,104 @@ def signin(request):
     if request.user.is_authenticated:
         return redirect('/')
     else:
-        if request.method=="POST":
-            username=request.POST['username']
-            password=request.POST["password"]
-            user=authenticate(username=username,password=password)
+        if request.method == "POST":
+            username = request.POST['username']
+            password = request.POST["password"]
+            user = authenticate(username=username, password=password)
+            
             if user is not None:
-                login(request,user)
-                return redirect('/')
+                login(request, user)
+                messages.success(request, "Login berhasil! Selamat datang, {}.".format(username))
+                return redirect('/')  # Redirect ke home setelah login berhasil
             else:
+                messages.error(request, "Username atau password salah! Silakan coba lagi.")
                 return redirect('/signin')
-        else:
-            return render(request,"login.html")
+
+        return render(request, "login.html")
 
 def signout(request):
     logout(request)
     return redirect('/signin')
 
 def signup(request):
-    if request.method=="POST":
-        username=request.POST['username']
-        password=request.POST['password']
-        confpassword=request.POST['confirmpassword']
-        if password==confpassword:
-            user=User.objects.create_user(username=username,password=password)
-            user.save()
-            login(request,user)
-            return redirect('/')
+    if request.method == "POST":
+        username = request.POST['username']
+        password = request.POST['password']
+        confpassword = request.POST['confirmpassword']
+
+        if password == confpassword:
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Username sudah digunakan! Coba yang lain.")
+                return redirect('/signup')
+            else:
+                user = User.objects.create_user(username=username, password=password)
+                user.save()
+                login(request, user)
+                messages.success(request, "Akun berhasil dibuat! Selamat datang, {}.".format(username))
+                return redirect('/')  # Redirect ke home setelah signup berhasil
         else:
+            messages.error(request, "Password tidak cocok! Silakan coba lagi.")
             return redirect('/signup')
-    else:
-        return render(request,"signup.html")
+
+    return render(request, "signup.html")
     
 def upload(request):
-    if request.user.is_authenticated:
-        if request.method=="POST":
-            pr=profilepic.objects.all().filter(user=request.user)
-            pr.delete()
-            pic=request.FILES['pic']
-            new=profilepic(user=request.user,pic=pic)
-            new.save()
-            return redirect('/home')
-        else:
-            return redirect('/home')
-    else:
-        return redirect('/home')
+    if request.method == 'POST' and request.FILES.get('pic'):
+        image = request.FILES['pic']
+        fs = FileSystemStorage()
+        filename = fs.save(image.name, image)
+
+        # Simpan gambar ke database dengan user
+        UploadedImage.objects.create(user=request.user, pic=filename)
+
+        return redirect('/home')  # Redirect ke halaman utama
+
+    # Ambil semua gambar yang diupload user saat ini, urutkan terbaru dulu
+    images = UploadedImage.objects.filter(user=request.user).order_by('-uploaded_at')
+    
+    return render(request, 'upload.html', {'img': images})
+
+def delete(request, image_id):
+    image = get_object_or_404(UploadedImage, id=image_id)
+
+    # Pastikan hanya pemilik gambar yang bisa menghapus (jika ingin fitur ini)
+    if request.user == image.user:
+        image.pic.delete()  # Hapus file dari sistem
+        image.delete()  # Hapus data dari database
+    return redirect('/home')
+
+def history(request):
+    images = UploadedImage.objects.filter(user=request.user).order_by('-uploaded_at')
+    return render(request, 'history.html', {'img': images})
+
+def detail(request, image_id):
+    image = get_object_or_404(UploadedImage, id=image_id, user=request.user)
+    return render(request, 'detail.html', {'image': image})
+
+def export_pdf(request):
+    images = UploadedImage.objects.filter(user=request.user).order_by('-uploaded_at')
+
+    # Konversi gambar ke base64
+    for img in images:
+        img_path = os.path.join(settings.MEDIA_ROOT, img.pic.name)
+        with default_storage.open(img_path, "rb") as image_file:
+            img.base64 = base64.b64encode(image_file.read()).decode('utf-8')
+
+    template_path = 'export_pdf_template.html'
+    context = {
+        'img': images,
+        'user': request.user,
+        'export_date': datetime.datetime.now().strftime("%d %B %Y, %H:%M")
+    }
+
+    template = get_template(template_path)
+    html = template.render(context)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="Riwayat_Deteksi.pdf"'
+
+    pisa_status = pisa.CreatePDF(html, dest=response)
+    if pisa_status.err:
+        return HttpResponse('Terjadi kesalahan saat membuat PDF', content_type='text/plain')
+
+    return response

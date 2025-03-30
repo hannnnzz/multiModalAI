@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include 'fragments/head.html' %}
+</head>
+<body>
+
+    {% include 'fragments/navbar.html' %}
+
+    <!-- FORM UPLOAD GAMBAR -->
+    <div class="d-flex justify-content-center mt-5">
+        <div class="card shadow-lg p-4" style="max-width: 600px; width: 100%; background: rgba(255, 255, 255, 0.9); border-radius: 10px;">
+            <h4 class="text-center mb-3">🖼️ Upload Gambar Tanaman Cabai</h4>
+            <form method="post" action="/upload/" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="fileInput" class="form-label">Pilih Gambar:</label>
+                    <input type="file" id="fileInput" name="pic" class="form-control" accept="image/*" required onchange="previewImage(event)">
+                </div>
+                <div class="text-center">
+                    <img id="preview" src="#" alt="Preview" class="img-thumbnail d-none" style="max-width: 200px; margin-bottom: 15px;">
+                    <button type="submit" class="btn btn-primary px-4 py-2 mt-2" style="font-weight: bold;">
+                        📤 Upload
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% include 'fragments/footer.html' %}
+    
+</body>
+</html>

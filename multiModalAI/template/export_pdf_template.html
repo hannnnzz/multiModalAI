@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Riwayat Deteksi</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h2 { text-align: center; color: #007bff; }
+        p { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; vertical-align: middle; }
+        th { background-color: #007bff; color: white; }
+        .siluet { text-align: center; margin-bottom: 10px; }
+        .siluet img { width: 120px; opacity: 0.3; }
+        .footer { margin-top: 20px; font-size: 12px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h2>📄 Riwayat Deteksi Penyakit Cabai</h2>
+
+    <!-- Siluet Gambar -->
+    <div class="siluet">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Chili_pepper.png" alt="Siluet Cabai">
+    </div>
+
+    <p>User: <strong>{{ user.username }}</strong></p>
+
+    <!-- Tabel Riwayat Deteksi (Dikombinasikan dengan Rekomendasi Perawatan) -->
+    <table>
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Gambar</th>
+                <th>Penyakit</th>
+                <th>Rekomendasi Perawatan</th>
+                <th>Tanggal Upload</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in img %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    <img src="data:image/jpeg;base64,{{ p.base64 }}" style="width: 80px; height: auto;"/>
+                </td>                
+                <td>{{ p.disease_name|default:"-" }}</td>
+                <td>{{ p.treatment|default:"Belum ada rekomendasi." }}</td>
+                <td>{{ p.uploaded_at|date:"d M Y, H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Dokumen ini diekspor oleh <strong>{{ user.username }}</strong> pada <strong>{{ export_date }}</strong></p>
+    </div>
+</body>
+</html>

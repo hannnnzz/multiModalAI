@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import profilepic
+from .models import UploadedImage
 
 # Register your models here.
 
-admin.site.register(profilepic)
+admin.site.register(UploadedImage)

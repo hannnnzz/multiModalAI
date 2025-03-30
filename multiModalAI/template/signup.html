@@ -1,18 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>signup</title>
+    <title>Signup</title>
+
+    <!-- Load CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <form action="" method="post">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="enter your username"><br>
-        <input type="password" name="password" placeholder="enter your password"><br>
-        <input type="password" name="confirmpassword" placeholder="renter your password">
-        <button type="submit">signup</button>
-    </form>
+    <div class="login-container">
+        <h1>SIGNUP</h1>
+        <h2>Chill(i) AI</h2>
+        {% if messages %}
+            <div class="alert-container">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <form action="" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <span class="input-icon"><i class="fa-solid fa-user"></i></span>
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+            <div class="input-group">
+                <span class="input-icon"><i class="fas fa-lock"></i></span>
+                <input type="password" name="confirmpassword" class="form-control" placeholder="Confirm Password" required>
+            </div>
+            <button type="submit" class="btn-login">Signup</button>
+            <div class="links">
+                <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

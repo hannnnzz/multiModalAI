@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #2E3192, #1BFFFF);
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    margin: 0;
+    position: relative;
+}
+
+.half-background {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: black;
+}
+
+.login-container {
+    background: white;
+    padding: 20px;
+    padding-bottom : 40px;
+    border-radius: 30px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 2;
+    position: relative;
+    max-width: 350px;
+    width: 100%;
+}
+
+/* Styling untuk judul */
+.login-container h1 {
+    font-size: 30px;
+    font-weight: 800;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #0052D4, #4364F7, #6FB1FC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: -25px;
+}
+
+.login-container h2 {
+    font-size: 24px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #0052D4, #4364F7, #6FB1FC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+/* Styling untuk input */
+.input-group {
+    display: flex;
+    align-items: center; 
+    background: white;
+    border: 2px solid #2E3192;
+    border-radius: 25px;
+    padding: 2px;
+    margin: 15px;
+    width: 100%;
+    max-width: 320px;
+}
+
+.input-icon {
+    margin-right: 8px;
+    margin-left : 15px;
+    color: #2E3192;
+}
+
+.input-group input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+    background: transparent;
+    padding: 10px;
+}
+
+/* Fokus input */
+.input-group input:focus {
+    border: none;
+    outline: none;
+}
+
+/* Tombol Login */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: linear-gradient(90deg, #2E3192, #1BFFFF);
+    border: none;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 4px 8px rgba(46, 49, 146, 0.4);
+}
+
+.btn-login:hover {
+    background: linear-gradient(90deg, #1BFFFF, #2E3192);
+    box-shadow: 0 6px 12px rgba(46, 49, 146, 0.6);
+}
+
+/* Links */
+.links {
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+.links a {
+    color: #2E3192;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+.alert-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    animation: fadeOut 4s ease-in-out forwards;
+}
+
+.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.error {
+    background-color: #F44336;
+    color: white;
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 0; display: none; }
+}
+
+/* Styling Navbar */
+.navbar {
+    padding: 10px 20px;
+    border-radius: 0 0 10px 10px;
+}
+
+/* Styling Container Upload */
+.upload-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+}
+
+/* Styling Button Upload */
+.upload-container button {
+    width: 100%;
+    background: #0052D4;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+/* Styling Alert */
+.alert-container {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    z-index: 999;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    animation: fadeOut 4s ease-in-out forwards;
+}
+
+.success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.error {
+    background-color: #F44336;
+    color: white;
+}

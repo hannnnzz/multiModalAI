@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include 'fragments/head.html' %}
+</head>
+<body>
+
+    {% include 'fragments/navbar.html' %}
+
+
+    <!-- DETAIL RIWAYAT -->
+    <div class="container mt-5">
+        <h2 class="text-center text-primary fw-bold">📋 Detail Gambar</h2>
+
+        <div class="card shadow-lg mx-auto mt-4 p-4" style="max-width: 600px;">
+            <img src="{{ image.pic.url }}" class="card-img-top img-thumbnail" alt="Uploaded Image">
+
+            <div class="card-body">
+                <h5 class="text-muted text-center">Gambar yang telah diunggah</h5>
+                
+                <div class="text-center mt-3">
+                    <a href="{% url 'history' %}" class="btn btn-secondary">🔙 Kembali</a>
+                    <a href="{% url 'delete' image.id %}" class="btn btn-danger"
+                    onclick="return confirm('Yakin ingin menghapus gambar ini?')">
+                        ❌ Hapus
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'fragments/footer.html' %}
+
+</body>
+</html>
