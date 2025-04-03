@@ -4,44 +4,114 @@
     {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
-
+    <title>Register</title>
+    
     <!-- Load CSS -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/stylelog.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 </head>
 <body>
-    <div class="login-container">
-        <h1>SIGNUP</h1>
-        <h2>Chill(i) AI</h2>
-        {% if messages %}
-            <div class="alert-container">
-                {% for message in messages %}
-                    <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        <form action="" method="post">
-            {% csrf_token %}
-            <div class="input-group">
-                <span class="input-icon"><i class="fa-solid fa-user"></i></span>
-                <input type="text" name="username" class="form-control" placeholder="Username" required>
-            </div>
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-lock"></i></span>
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
-            </div>
-            <div class="input-group">
-                <span class="input-icon"><i class="fas fa-lock"></i></span>
-                <input type="password" name="confirmpassword" class="form-control" placeholder="Confirm Password" required>
-            </div>
-            <button type="submit" class="btn-login">Signup</button>
-            <div class="links">
-                <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
-            </div>
-        </form>
+    <!-- ERROR NOTIFICATION -->
+    {% if messages %}
+    <div class="alert-container">
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+            <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+            {{ message }}
+        </div>
+        {% endfor %}
     </div>
+    {% endif %}
+
+
+    <form action="{% url 'signup' %}" method="post" id="loginForm">
+        {% csrf_token %}
+        <div class="box">
+            <div class="login">
+                <div class="loginBx">
+                    <h2>
+                        <i class="fa-solid fa-pepper-hot" style="margin-top: 70px;" id="flip"></i> Regist <i class="fa-solid fa-pepper-hot"></i>
+                    </h2>
+                    
+                    <input type="text" name="username" class="form-control" placeholder="Username" required>
+                    
+                    <div class="form-group">
+                        <input id="password" type="password" name="password" placeholder="Password" required>
+                        <button type="button" class="eye-toggle" title="Reveal Password" aria-pressed="false">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <mask id="eye-open">
+                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12V20H12H1V12Z" 
+                                            fill="#D9D9D9" stroke="black" stroke-width="1.5" stroke-linejoin="round" />
+                                    </mask>
+                                    <mask id="eye-closed">
+                                        <path d="M1 12C1 12 5 20 12 20C19 20 23 12 23 12V20H12H1V12Z" fill="#D9D9D9" />
+                                    </mask>
+                                </defs>
+                                <path class="lid lid--upper" 
+                                    d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12" 
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path class="lid lid--lower" 
+                                    d="M1 12C1 12 5 20 12 20C19 20 23 12 23 12" 
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <g mask="url(#eye-open)">
+                                    <g class="eye">
+                                        <circle cy="12" cx="12" r="4" fill="currentColor" />
+                                        <circle cy="11" cx="13" r="1" fill="black" />
+                                    </g>
+                                </g>
+                            </svg>
+                            <span class="sr-only">Reveal Password</span>
+                        </button>
+                    </div>
+
+                    <div class="form-group">
+                        <input id="confirmpassword" type="password" name="confirmpassword" placeholder="Confirm Password" required>
+                        <button type="button" class="eye-toggle" title="Reveal Password" aria-pressed="false">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <mask id="eye-open">
+                                        <path d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12V20H12H1V12Z" 
+                                            fill="#D9D9D9" stroke="black" stroke-width="1.5" stroke-linejoin="round" />
+                                    </mask>
+                                    <mask id="eye-closed">
+                                        <path d="M1 12C1 12 5 20 12 20C19 20 23 12 23 12V20H12H1V12Z" fill="#D9D9D9" />
+                                    </mask>
+                                </defs>
+                                <path class="lid lid--upper" 
+                                    d="M1 12C1 12 5 4 12 4C19 4 23 12 23 12" 
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <path class="lid lid--lower" 
+                                    d="M1 12C1 12 5 20 12 20C19 20 23 12 23 12" 
+                                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                <g mask="url(#eye-open)">
+                                    <g class="eye">
+                                        <circle cy="12" cx="12" r="4" fill="currentColor" />
+                                        <circle cy="11" cx="13" r="1" fill="black" />
+                                    </g>
+                                </g>
+                            </svg>
+                            <span class="sr-only">Reveal Password</span>
+                        </button>
+                    </div>
+                    
+                    <input type="submit" value="Register" class="btn-login" />
+                    
+                    <div class="group">
+                        <a href="#">Forgot Password</a>
+                        <a href="{% url 'login' %}">Sign In</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Scripts -->
+    <script src="https://assets.codepen.io/16327/MorphSVGPlugin3.min.js"></script>
+    <script src="https://assets.codepen.io/16327/ScrambleTextPlugin3.min.js"></script>
+    <script src="https://unpkg.com/gsap@3.11.0/dist/gsap.min.js"></script>
+    <script src="{% static 'js/scriptlog.js' %}"></script>
 </body>
 </html>

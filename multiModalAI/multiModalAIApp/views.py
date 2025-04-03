@@ -14,6 +14,7 @@ from xhtml2pdf import pisa
 from .models import UploadedImage
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
+from django.contrib.auth import authenticate, login
 
 # Create your views here.
 
@@ -36,7 +37,6 @@ def signin(request):
             
             if user is not None:
                 login(request, user)
-                messages.success(request, "Login berhasil! Selamat datang, {}.".format(username))
                 return redirect('/')  # Redirect ke home setelah login berhasil
             else:
                 messages.error(request, "Username atau password salah! Silakan coba lagi.")
