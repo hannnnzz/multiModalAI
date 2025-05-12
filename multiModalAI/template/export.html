@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    {% include 'fragments/head.html' %}
+</head>
+<body>
+
+    {% include 'fragments/navbar.html' %}
+
+    <!-- EKSPOR DATA -->
+    <div class="container mt-5">
+        <h2 class="text-center text-primary fw-bold">📥 Ekspor Data</h2>
+        <p class="text-center text-muted">Unduh hasil deteksi dalam format PDF untuk keperluan dokumentasi.</p>
+
+        {% if img %}
+            <!-- Tabel Riwayat Deteksi -->
+            <div class="table-responsive mt-4">
+                <table class="table table-bordered text-center">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>No</th>
+                            <th>Gambar</th>
+                            <th>Deteksi</th>
+                            <th>Tanggal Upload</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in img %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <img src="{{ p.pic.path }}" class="img-thumbnail" style="max-width: 80px;" alt="Gambar">
+                            </td>
+                            <td>{{ p.disease_name|default:"-" }}</td>
+                            <td>{{ p.uploaded_at|date:"d M Y, H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tombol Ekspor PDF -->
+            <div class="text-center mt-4">
+                <a href="{% url 'export_pdf' %}" class="btn btn-success px-4 py-2 fw-bold">
+                    📄 Ekspor ke PDF
+                </a>
+            </div>
+        
+        {% else %}
+            <p class="text-center text-muted mt-4">Belum ada data yang bisa diekspor.</p>
+        {% endif %}
+    </div>
+
+    {% include 'fragments/footer.html' %}
+
+</body>
+</html>

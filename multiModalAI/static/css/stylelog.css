@@ -1,0 +1,148 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Poppins:wght@900&display=swap");
+
+body {
+  display: grid;
+  height: 100vh;
+  margin: 0;
+  place-items: center;
+  background: linear-gradient(to right, #f29877, #2f3273, #f21f0c);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper {
+  position: relative;
+}
+
+.circle {
+  position: absolute;
+  height: 150px;
+  width: 150px;
+  background: black;
+  border-radius: 50%;
+}
+
+.circle1 {
+  background: #8eacbf;
+  right: -60px;
+  top: -60px;
+  animation: circle1 5s ease-in-out alternate infinite;
+}
+
+@keyframes circle1 {
+  100% {
+    top: 60px;
+  }
+}
+
+.circle2 {
+  background: #6581a6;
+  bottom: -60px;
+  left: -60px;
+  animation: circle2 5s ease-in-out alternate infinite;
+}
+
+@keyframes circle2 {
+  100% {
+    bottom: 60px;
+  }
+}
+
+.form {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  display: grid;
+  place-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 26px 42px rgba(0, 0, 0, 0.1);
+  font-family: "Montserrat", sans-serif;
+}
+
+h1 {
+  font-family: "Poppins", sans-serif;
+  color: white;
+  letter-spacing: 2px;
+  margin-top: 0;
+}
+
+input,
+button {
+  font-size: 16px;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 20px auto;
+  padding: 12px 20px;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 13px 21px rgba(0, 0, 0, 0.05);
+}
+
+input:focus {
+  outline: none;
+}
+
+input::placeholder {
+  color: white;
+}
+
+button {
+  cursor: pointer;
+  background: #f64f59;
+  color: white;
+  transition: 0.5s;
+}
+
+button:hover {
+  background: #12c2e9;
+}
+
+.signup-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 10px; 
+}
+
+.signup-center a {
+  font-size: 14px;
+  color: white;
+  text-decoration: none;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* ruang untuk ikon */
+}
+
+.input-wrapper .toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1em;
+}
