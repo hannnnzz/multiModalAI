@@ -37,12 +37,6 @@ db.sqlite3
 local_settings.py
 .pytest_cache/
 
-# Media uploads (user‑uploaded files)
-media/
-
-# ML model files (jika model besar disimpan di sini)
-model/
-
 # IDE/editor
 .vscode/
 .idea/
@@ -51,9 +45,6 @@ model/
 .DS_Store
 # Windows
 Thumbs.db
-
-# Misc
-all‑files.txt
 ```
 ```bash
 git add .    
