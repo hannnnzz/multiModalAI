@@ -40,3 +40,9 @@ Isi title & description, lalu Create Pull Request
 ```bash
 python manage.py runserver    
 ```
+## 7. Tambahan Streamlit
+```bash
+pip install streamlit
+streamlit run streamlit/app.py
+```    
+Pastikan Run Streamlit di terminal berbeda
