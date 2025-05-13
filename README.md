@@ -15,7 +15,46 @@ python manage.py migrate
 git branch nama_fitur    
 git checkout nama_fitur
 ```
-(lakukan coding di editor / IDE kamu)    
+(lakukan coding di editor / IDE kamu) lalu untuk Push lakukan ini    
+Buat .gitignore
+```bash
+# Byte‑compiled / cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*~
+
+# Virtual environments
+.venv/
+multiModalAI/env/
+
+# SQLite database
+db.sqlite3
+*.sqlite3-journal
+
+# Django logs, local settings, test cache
+*.log
+local_settings.py
+.pytest_cache/
+
+# Media uploads (user‑uploaded files)
+media/
+
+# ML model files (jika model besar disimpan di sini)
+model/
+
+# IDE/editor
+.vscode/
+.idea/
+*.sw?
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
+
+# Misc
+all‑files.txt
+```
 ```bash
 git add .    
 git commit -m "deskripsi singkat perubahan"    
