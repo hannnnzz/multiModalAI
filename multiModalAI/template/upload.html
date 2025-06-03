@@ -7,51 +7,53 @@
 
     {% include 'fragments/navbar.html' %}
 
-    <!-- FORM UPLOAD GAMBAR -->
-    <div class="d-flex justify-content-center mt-5">
-        <div class="card shadow-lg p-4 text-center" style="max-width: 600px; background-color: #6581a6; border-radius: 10px;">
-            <h4 class="mb-3 fw-semibold">Upload Gambar Tanaman Cabai</h4>
-    
-            <form method="post" action="/upload/" enctype="multipart/form-data">
-                {% csrf_token %}
-                
-                <!-- Area Drag & Drop -->
-                <div id="dropZone" class="border border-secondary border-2 rounded p-4 mb-3" 
-                        style="cursor: pointer; background-color: #ffff;">
-                    <p class="text-muted mb-1">Drag & Drop</p>
-                    <p class="text-muted">Click to Choose</p>
-                    <input type="file" name="pic" id="fileInput" class="d-none" accept="image/*" required>
+    <!-- UPLOAD FORM -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                <div class="card shadow-lg p-4 text-center" style="background-color: #6581a6; border-radius: 10px;">
+                    <h4 class="mb-3 fw-semibold text-black">Upload Gambar Tanaman Cabai</h4>
+
+                    <form method="post" action="/upload/" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Drop Zone -->
+                        <div id="dropZone" class="border border-secondary border-2 rounded p-4 mb-3 bg-white"
+                             style="cursor: pointer;">
+                            <p class="text-muted mb-1">Drag & Drop</p>  
+                            <p class="text-muted">Click to Choose</p>   
+                            <input type="file" name="pic" id="fileInput" class="d-none" accept="image/*" required>
+                        </div>
+
+                        <!-- Preview -->
+                        <img id="preview" src="#" alt="Preview" 
+                             class="img-thumbnail d-none mb-3 mx-auto" style="max-width: 200px;">
+
+                        <!-- Button -->
+                        <button type="submit" class="btn px-4 py-2 fw-bold" style="background-color: #f29877;">
+                            Upload
+                        </button>
+                    </form>
                 </div>
-    
-                <!-- Preview -->
-                <img id="preview" src="#" alt="Preview" class="img-thumbnail d-none mb-3" style="max-width: 200px;">
-    
-                <button type="submit" class="btn px-4 py-2 fw-bold" style="background-color: #f29877;" >
-                    Upload
-                </button>
-            </form>
+            </div>
         </div>
     </div>
-    
 
     {% include 'fragments/footer.html' %}
-    
+
     <script>
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const preview = document.getElementById('preview');
-    
+
         dropZone.addEventListener('click', () => fileInput.click());
-    
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             dropZone.classList.add('border-primary');
         });
-    
         dropZone.addEventListener('dragleave', () => {
             dropZone.classList.remove('border-primary');
         });
-    
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('border-primary');
@@ -61,12 +63,11 @@
                 showPreview(file);
             }
         });
-    
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) showPreview(file);
         });
-    
+
         function showPreview(file) {
             const reader = new FileReader();
             reader.onload = (e) => {

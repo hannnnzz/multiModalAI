@@ -1,15 +1,30 @@
-{% load static %}
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chill(i) AI</title>
+<!-- Potongan Kode Header -->
+{% load static %}  <!-- Muat tag static Django untuk asset statis -->
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- Responsif di perangkat mobile -->
+<title>Chili AI</title>  <!-- Judul halaman yang muncul di tab browser -->
+
+<!-- Font Poppins dari Google Fonts dengan berbagai bobot -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+<!-- Style utama CSS dari direktori statis Django -->
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<!-- Ikon Favicon -->
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1236/1236936.png" type="image/png">
+
+<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- CSS Bootstrap 5.3 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- JavaScript Bootstrap 5.3 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <style>
     body {
+        /* Latar belakang gradien horizontal dan teks putih untuk keseluruhan halaman */
         background: linear-gradient(to right, #f21f0c, #2f3273, #6581a6);
         color: white;
     }
@@ -19,11 +34,7 @@
         padding: 15px;
         text-align: center;
     }
-    .upload-section {
-        background: white;
-        color: black;
-        padding: 20px;
-        border-radius: 10px;
-    }
 </style>
+
+<!-- SweetAlert2 untuk Notifikasi Berbasis Modal -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

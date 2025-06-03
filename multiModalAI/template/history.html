@@ -1,38 +1,42 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    {% include 'fragments/head.html' %}
+    {% include 'fragments/head.html' %}  <!-- Potongan kode header -->
 </head>
 <body>
 
-    {% include 'fragments/navbar.html' %}
+    {% include 'fragments/navbar.html' %}  <!-- Potongan kode navbar -->
 
     <!-- RIWAYAT DETEKSI -->
-    <div class="container mt-5">
-        <h2 class="text-center fw-bold">Riwayat Deteksi</h2>
+    <div class="container mt-5">  
+        <h2 class="text-center fw-bold">Riwayat Deteksi</h2>  
         
         {% if img %}
-            <div class="d-flex flex-wrap justify-content-center gap-4 mt-4">
+            <div class="row g-4 justify-content-center mt-4">
                 {% for p in img %}
-                    <div class="card shadow-sm position-relative text-center p-3" style="width: 22rem; border-radius: 10px; background-color: #f29877;">
-                        <img src="{{ p.pic.url }}" class="card-img-top" alt="Uploaded Image" 
-                            style="max-height: 220px; object-fit: cover; border-radius: 10px;">
-                        
-                        <div class="card-body">
-                            <p class="fw-bold text-muted">Deteksi: {{ p.disease_name|default:"-" }}</p>
+                    <div class="col-12 col-sm-6 col-lg-4 d-flex justify-content-center">
+                        <div class="card shadow-sm position-relative text-center p-3 h-100" 
+                            style="width: 100%; max-width: 22rem; border-radius: 10px; background-color: #f29877;">
                             
-                            <!-- Tombol Detail -->
-                            <a href="{% url 'detail' p.id %}" class="btn btn-info btn-sm px-3">
-                                <i class="fas fa-magnifying-glass me-1"></i> Detail
-                            </a>
+                            <img src="{{ p.pic.url }}" class="card-img-top" alt="Uploaded Image" 
+                                style="width: 100%; height: 220px; object-fit: fill; border-radius: 10px;">
+                            
+                            <div class="card-body d-flex flex-column justify-content-between">
+                                <p class="fw-bold text-muted">Deteksi: {{ p.disease_name|default:"-" }}</p>
+                                
+                                <div class="d-flex justify-content-center gap-2 mt-2">
+                                    <a href="{% url 'detail' p.id %}" class="btn btn-info btn-sm px-3">
+                                        <i class="fas fa-magnifying-glass me-1"></i> Detail
+                                    </a>
 
-                            <!-- Tombol Hapus -->
-                            <form method="post" action="{% url 'delete' p.id %}" class="d-inline delete-form">
-                                {% csrf_token %}
-                                <button type="button" class="btn btn-danger btn-sm px-3 delete-button">
-                                    <i class="fas fa-trash me-1"></i> Hapus
-                                </button>
-                            </form>
+                                    <form method="post" action="{% url 'delete' p.id %}" class="d-inline delete-form">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn btn-danger btn-sm px-3 delete-button">
+                                            <i class="fas fa-trash me-1"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 {% endfor %}
@@ -42,7 +46,8 @@
         {% endif %}
     </div>
 
-    {% include 'fragments/footer.html' %}
+
+    {% include 'fragments/footer.html' %}  <!-- Potongan kode footer -->
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -53,23 +58,25 @@
                     const form = this.closest("form");
         
                     Swal.fire({
-                        title: 'Yakin ingin menghapus?',
-                        text: "Data yang dihapus tidak bisa dikembalikan.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Ya, hapus!',
-                        cancelButtonText: 'Batal'
+                        background: '#2f3273',            // Warna latar modal
+                        color: '#fff',                     // Warna teks modal
+                        title: 'Yakin ingin menghapus?',   // Judul modal konfirmasi
+                        text: "Data yang dihapus tidak bisa dikembalikan.",  // Pesan detail
+                        icon: 'warning',                   // Ikon peringatan
+                        showCancelButton: true,            // Tampilkan tombol batal
+                        confirmButtonColor: '#d33',        // Warna tombol konfirmasi
+                        cancelButtonColor: '#6c757d',      // Warna tombol batal
+                        confirmButtonText: 'Ya, hapus!',   // Label tombol konfirmasi
+                        cancelButtonText: 'Batal'          // Label tombol batal
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            form.submit();
+                            form.submit();  // Submit form jika dikonfirmasi
                         }
                     });
                 });
             });
         });
-        </script>
-        
+    </script>
+    
 </body>
 </html>

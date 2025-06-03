@@ -20,6 +20,7 @@ from multiModalAIApp.views import *
 from django.conf import settings
 from django.conf.urls.static import static
 
+# Path URL untuk aplikasi
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/',home, name="home"),

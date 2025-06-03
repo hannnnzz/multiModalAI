@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    {% load static %}
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    {% load static %}  <!-- Muat tag static Django untuk mengakses file statis -->
+    <meta charset="UTF-8">  <!-- Encoding karakter dokumen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- Responsif di perangkat mobile -->
+    <title>Login</title>  <!-- Judul halaman pada tab browser -->
 
     <!-- Load CSS -->
-    <link rel="stylesheet" href="{% static 'css/stylelog.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Poppins:wght@900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/stylelog.css' %}">  <!-- Gaya khusus halaman login -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Poppins:wght@900&display=swap" rel="stylesheet">  <!-- Font Google Montserrat & Poppins -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  <!-- Ikon Font Awesome -->
 </head>
 <body>
-    {% if messages %}
+    <!-- MESSAGE HANDLER -->
+    {% if messages %}  
     <div class="alert-container">
-        {% for message in messages %}
+        {% for message in messages %}  
         <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
             <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
             {{ message }}
@@ -23,36 +24,38 @@
     </div>
     {% endif %}
 
-    <!-- Register Form -->
-    <div class="wrapper">
-        <div class="circle circle1"></div>
-        <div class="circle circle2"></div>
+    <!-- REGIST FORM -->
+    <div class="wrapper">  
+        <div class="circle circle1"></div>  
+        <div class="circle circle2"></div>  
         <div class="form">
-        <h1 class="signup-center">Register Chili AI</h1>
-        <form action="{% url 'signup' %}" method="post" id="loginForm">
-            {% csrf_token %}
-            <input type="text" name="username" placeholder="Username" required>
-            <!-- Password field dengan toggle -->
-            <div class="input-wrapper">
-            <input id="password" type="password" name="password" placeholder="Password" required>
-            <i class="fa-solid fa-eye toggle-password" data-target="password"></i>
-            </div>
-    
-            <!-- Confirm Password field dengan toggle -->
-            <div class="input-wrapper">
-            <input id="confirmpassword" type="password" name="confirmpassword" placeholder="Confirm Password" required>
-            <i class="fa-solid fa-eye toggle-password" data-target="confirmpassword"></i>
-            </div>
-    
-            <button type="submit">Register</button>
-            <div class="signup-center">
-            <a href="{% url 'login' %}">Sign In</a>
-            </div>
-        </form>
+            <h1 class="signup-center">Register Chili AI</h1>  
+
+            <form action="{% url 'signup' %}" method="post" id="loginForm">  <!-- Form POST ke view 'signup' -->
+                {% csrf_token %}  <!-- Token keamanan CSRF Django -->
+                <input type="text" name="username" placeholder="Username" required>  <!-- Input username wajib -->
+
+                <!-- Password field dengan toggle visibility -->
+                <div class="input-wrapper">
+                    <input id="password" type="password" name="password" placeholder="Password" required>  <!-- Input password wajib -->
+                    <i class="fa-solid fa-eye toggle-password" data-target="password"></i>  <!-- Ikon toggle untuk menampilkan/menyembunyikan password -->
+                </div>
+        
+                <!-- Confirm Password field dengan toggle visibility -->
+                <div class="input-wrapper">
+                    <input id="confirmpassword" type="password" name="confirmpassword" placeholder="Confirm Password" required>  <!-- Input konfirmasi password wajib -->
+                    <i class="fa-solid fa-eye toggle-password" data-target="confirmpassword"></i>  <!-- Ikon toggle untuk konfirmasi password -->
+                </div>
+        
+                <button type="submit">Register</button>  <!-- Tombol submit form -->
+                <div class="signup-center">
+                    <a href="{% url 'login' %}">Sign In</a>  <!-- Link ke halaman login -->
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- JS -->
-    <script src="{% static 'js/scriptlog.js' %}"></script>
+    <script src="{% static 'js/scriptlog.js' %}"></script>  
 </body>
 </html>

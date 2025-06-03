@@ -75,6 +75,7 @@ WSGI_APPLICATION = "multiModalAI.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# Setup Database di Localhost
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",

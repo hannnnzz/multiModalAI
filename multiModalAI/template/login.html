@@ -6,43 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
 
-    <!-- Load CSS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="{% static 'css/stylelog.css' %}">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Poppins:wght@900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <!-- Error Notification -->
+
+    <!-- MESSAGE HANDLER -->
     {% if messages %}
     <div class="alert-container">
         {% for message in messages %}
         <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
-            <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %}"></i>
+            <i class="fas 
+                {% if message.tags == 'error' %}fa-exclamation-circle
+                {% elif message.tags == 'success' %}fa-check-circle
+                {% else %}fa-info-circle{% endif %}"></i>
             {{ message }}
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Login Form -->
+    <!-- LOGIN WRAPPER -->
     <div class="wrapper">
         <div class="circle circle1"></div>
         <div class="circle circle2"></div>
-        <div class="form">
-            <h1>Login Chili AI</h1>
-            <form action="{% url 'login' %}" method="post">
-                {% csrf_token %}
-                <input type="text" name="username" placeholder="Username" required />
-                <input type="password" name="password" placeholder="Password" required />
-                <button type="submit">Login</button>
-                <div class="signup-center">
-                    <a href="{% url 'signup' %}">Sign Up</a>
-                </div>
-            </form>
+        <div class="form-container">
+            <div class="form">
+                <h1>Login Chili AI</h1>
+                <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <input type="text" name="username" placeholder="Username" required />
+                    <input type="password" name="password" placeholder="Password" required />
+                    <button type="submit">Login</button>
+                    <div class="signup-center">
+                        <a href="{% url 'signup' %}">Sign Up</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Optional JS -->
+    <!-- JS -->
     <script src="{% static 'js/scriptlog.js' %}"></script>
 </body>
 </html>

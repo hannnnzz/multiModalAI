@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 from django.db import models
 
+# Model untuk menyimpan gambar yang diupload
 class UploadedImage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pic = models.ImageField(upload_to='uploads/')
