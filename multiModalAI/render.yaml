@@ -3,7 +3,7 @@ services:
     name: multimodalai
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn multiModalAI.wsgi
+    startCommand: gunicorn multiModalAI.multiModalAI.wsgi
     envVars:
       - key: DEBUG
         value: "False"
