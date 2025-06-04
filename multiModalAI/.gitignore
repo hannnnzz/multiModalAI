@@ -1,0 +1,32 @@
+# Byte‑compiled / cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*~
+
+# Virtual environments
+.venv/
+env/
+multiModalAI/env/
+
+# SQLite database
+db.sqlite3
+*.sqlite3-journal
+
+# Django logs, local settings, test cache
+*.log
+local_settings.py
+.pytest_cache/
+
+# IDE/editor
+.vscode/
+.idea/
+*.sw?
+# macOS
+.DS_Store
+# Windows
+Thumbs.db
+
+# Misc
+media/
+all‑files.txt

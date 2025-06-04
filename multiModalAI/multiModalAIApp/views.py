@@ -21,8 +21,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
 from django.contrib.auth import authenticate, login
 
-# 1) Mapping nama kelas → deskripsi, treatment, dan prevention (sudah dirangkum)
-# ---------------------------------------------
+# Mapping nama kelas → deskripsi, treatment, dan prevention
 disease_info = {
     'Anthracnose': {
         'name': 'Anthracnose',
@@ -236,7 +235,7 @@ def upload(request):
         prediction = model.predict(img_array)
         predicted_class = np.argmax(prediction)
         confidence = np.max(prediction) * 100  # ambil confidence terbesar
-
+        
         disease_name = f"{disease_classes[predicted_class]} ({confidence:.2f}%)"
 
 
