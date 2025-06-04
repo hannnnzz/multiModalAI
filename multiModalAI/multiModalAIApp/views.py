@@ -151,9 +151,10 @@ disease_info = {
 }
 
 # Load model sekali di awal
-''' Model untuk Local
+
 model_path = os.path.join(settings.BASE_DIR, 'model', 'model_mobilenettv.h5')  
 model = load_model(model_path)
+
 '''
 # path ke .tflite
 tflite_model_path = os.path.join(settings.BASE_DIR, 'model', 'model_mobilenettv.tflite')
@@ -163,6 +164,7 @@ interpreter.allocate_tensors()
 # Ambil detail input/output
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
+'''
 
 # Mapping hasil prediksi ke nama penyakit
 disease_classes = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healthy', 'Bug', 'Yellowish']
@@ -241,13 +243,12 @@ def upload(request):
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array /= 255.0  # Normalisasi jika modelmu pakai itu
-
-        ''' Model Untuk Lokal
+        
         prediction = model.predict(img_array)
         predicted_class = np.argmax(prediction)
         confidence = np.max(prediction) * 100  # ambil confidence terbesar
-        '''
         
+        '''
         # Set input tensor
         interpreter.set_tensor(input_details[0]['index'], img_array.astype(input_details[0]['dtype']))
         # Jalankan inference
@@ -256,7 +257,7 @@ def upload(request):
         pred = interpreter.get_tensor(output_details[0]['index'])
         predicted_class = np.argmax(pred)
         confidence = np.max(pred) * 100
-
+        '''
         
         disease_name = f"{disease_classes[predicted_class]} ({confidence:.2f}%)"
 

@@ -56,25 +56,8 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "multiModalAI.multiModalAI.urls"
+ROOT_URLCONF = "multiModalAI.urls"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR.parent / "template"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
-'''Local
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -90,23 +73,22 @@ TEMPLATES = [
         },
     },
 ]
-'''
 
-WSGI_APPLICATION = "multiModalAI.multiModalAI.wsgi.application"
+WSGI_APPLICATION = "multiModalAI.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Setup Database di Localhost
+''' Database Deploy
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600
     )
 }   
-
-''' Localhost
+'''
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -116,7 +98,6 @@ DATABASES = {
         "HOST" : "localhost",
     }
 }
-'''
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -153,18 +134,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "/static/"
-''' Lokal
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 MEDIA_URL='/media/'
-'''
-STATICFILES_DIRS = [
-    BASE_DIR.parent / "static",  # Tambah .parent
-]
-STATIC_ROOT = os.path.join(BASE_DIR.parent, 'staticfiles')  # Tambah .parent
-MEDIA_ROOT = os.path.join(BASE_DIR.parent, 'media')  # Tambah .parent
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 
