@@ -7,12 +7,38 @@
 
     {% include 'fragments/navbar.html' %}  <!-- Potongan kode navbar -->
 
+
     <!-- RIWAYAT DETEKSI -->
     <div class="container mt-5">  
-        <h2 class="text-center fw-bold">Riwayat Deteksi</h2>  
+        <h2 class="text-center fw-bold mb-4">Riwayat Deteksi</h2> 
+        
+        <!-- Filter Hari -->
+        <div class="d-flex mb-3 align-items-center">
+            <form method="get" class="d-inline me-2" style="display: flex; align-items: center;">
+                <label for="filterDays" class="me-1 fw-semibold">Filter:</label>
+                <select name="days" id="filterDays" class="form-select d-inline w-auto"
+                        onchange="this.form.submit()" style="margin:0;">
+                    <option value="" {% if not filter_days %}selected{% endif %}>Semua Hari</option>
+                    <option value="1" {% if filter_days == '1' %}selected{% endif %}>1 Hari Terakhir</option>
+                    <option value="3" {% if filter_days == '3' %}selected{% endif %}>3 Hari Terakhir</option>
+                    <option value="7" {% if filter_days == '7' %}selected{% endif %}>7 Hari Terakhir</option>
+                </select>
+            </form>
+
+            <!-- Filter Penyakit -->
+            <form method="get" class="d-inline" style="display: flex; align-items: center;">
+                <select name="disease" id="filterDisease" class="form-select d-inline w-auto"
+                        onchange="this.form.submit()" style="margin:0;">
+                    <option value="" {% if not filter_disease %}selected{% endif %}>Semua Penyakit</option>
+                    {% for disease in disease_list %}
+                        <option value="{{ disease }}" {% if filter_disease == disease %}selected{% endif %}>{{ disease }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
         
         {% if img %}
-            <div class="row g-4 justify-content-center mt-4">
+            <div class="row g-4 justify-content-center mt-1">
                 {% for p in img %}
                     <div class="col-12 col-sm-6 col-lg-4 d-flex justify-content-center">
                         <div class="card shadow-sm position-relative text-center p-3 h-100" 

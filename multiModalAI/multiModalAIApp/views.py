@@ -20,6 +20,8 @@ from .models import UploadedImage
 from django.core.files.storage import FileSystemStorage
 from django.core.files.storage import default_storage
 from django.contrib.auth import authenticate, login
+from django.utils import timezone
+from datetime import timedelta
 
 # Mapping nama kelas → deskripsi, treatment, dan prevention
 disease_info = {
@@ -173,32 +175,38 @@ disease_classes = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healt
 
 # Fungsi untuk mengambil halaman utama
 def home(request):
-    if request.user.is_authenticated:
-        images = UploadedImage.objects.filter(user=request.user)
-        
-        # Hitung distribusi penyakit
-        total = images.count()
-        labels = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healthy', 'Bug', 'Yellowish']
-        values = []
-        
-        for label in labels:
-            count = images.filter(disease_name=label).count()
-            if total > 0:
-                values.append(round(count / total * 100, 2))
-            else:
-                values.append(0)
-        
-        context = {
-            "img": images,
-            "chart_data": {
-                "labels": labels,
-                "values": values,
-            }
-        }
-        return render(request, "home.html", context)
-    else:
+    if not request.user.is_authenticated:
         return redirect('/signin')
 
+    # Ambil semua gambar milik user
+    images = UploadedImage.objects.filter(user=request.user)
+    total = images.count()
+    
+    # Ambil 4 gambar terbaru
+    recent_images = images.order_by('-uploaded_at')[:3]
+
+    # Definisikan labels chart
+    labels = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healthy', 'Bug', 'Yellowish']
+    values = []
+
+    # Hitung persentase per label
+    for label in labels:
+        count = images.filter(disease_name__startswith=label).count()
+        if total > 0:
+            values.append(round(count / total * 100, 2))
+        else:
+            values.append(0)
+
+    # Siapkan context untuk template
+    context = {
+        'img': images,
+        'recent_images': recent_images,
+        'chart_data': {
+            'labels': labels,
+            'values': values,
+        }
+    }
+    return render(request, 'home.html', context)
 
 # Fungsi untuk mengambil halaman login
 # Jika sudah login, redirect ke home
@@ -267,7 +275,6 @@ def upload(request):
         prediction = model.predict(img_array)
         predicted_class = np.argmax(prediction)
         
-        
         '''
         # Set input tensor
         interpreter.set_tensor(input_details[0]['index'], img_array.astype(input_details[0]['dtype']))
@@ -308,8 +315,42 @@ def delete(request, image_id):
 
 # Fungsi untuk mengambil halaman history
 def history(request):
-    images = UploadedImage.objects.filter(user=request.user).order_by('-uploaded_at')
-    return render(request, 'history.html', {'img': images})
+    # Ambil parameter filter dari query string
+    filter_days = request.GET.get('days')  # Contoh: '1', '3', '7'
+    filter_disease = request.GET.get('disease')  # Contoh: 'Anthracnose'
+
+    images = UploadedImage.objects.filter(user=request.user)
+
+    # Filter berdasarkan hari
+    if filter_days and filter_days.isdigit():
+        days = int(filter_days)
+        cutoff_date = timezone.now() - timedelta(days=days)
+        images = images.filter(uploaded_at__gte=cutoff_date)
+
+    # Filter berdasarkan penyakit dengan case-insensitive exact match
+    if filter_disease and filter_disease != '':
+        images = images.filter(disease_name__iexact=filter_disease)
+
+    images = images.order_by('-uploaded_at')
+
+    # Ambil daftar penyakit unik milik user untuk dropdown filter, urut alfabet
+    disease_list = (
+        UploadedImage.objects
+        .filter(user=request.user)
+        .values_list('disease_name', flat=True)
+        .distinct()
+        .order_by('disease_name')
+    )
+
+    context = {
+        'img': images,
+        'filter_days': filter_days,
+        'filter_disease': filter_disease,
+        'disease_list': disease_list,
+    }
+
+    return render(request, 'history.html', context)
+
 
 # Fungsi untuk mengambil halaman detail
 def detail(request, image_id):
