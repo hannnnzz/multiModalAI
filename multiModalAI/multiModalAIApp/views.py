@@ -174,11 +174,31 @@ disease_classes = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healt
 # Fungsi untuk mengambil halaman utama
 def home(request):
     if request.user.is_authenticated:
-        pr=UploadedImage.objects.all().filter(user=request.user)
-        c={"img":pr}
-        return render(request,"home.html",context=c)
+        images = UploadedImage.objects.filter(user=request.user)
+        
+        # Hitung distribusi penyakit
+        total = images.count()
+        labels = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healthy', 'Bug', 'Yellowish']
+        values = []
+        
+        for label in labels:
+            count = images.filter(disease_name=label).count()
+            if total > 0:
+                values.append(round(count / total * 100, 2))
+            else:
+                values.append(0)
+        
+        context = {
+            "img": images,
+            "chart_data": {
+                "labels": labels,
+                "values": values,
+            }
+        }
+        return render(request, "home.html", context)
     else:
         return redirect('/signin')
+
 
 # Fungsi untuk mengambil halaman login
 # Jika sudah login, redirect ke home
@@ -246,7 +266,7 @@ def upload(request):
         
         prediction = model.predict(img_array)
         predicted_class = np.argmax(prediction)
-        confidence = np.max(prediction) * 100  # ambil confidence terbesar
+        
         
         '''
         # Set input tensor
@@ -259,7 +279,7 @@ def upload(request):
         confidence = np.max(pred) * 100
         '''
         
-        disease_name = f"{disease_classes[predicted_class]} ({confidence:.2f}%)"
+        disease_name = f"{disease_classes[predicted_class]}"
 
 
         # Simpan ke database
