@@ -14,27 +14,24 @@
         
         <!-- Filter Hari -->
         <div class="d-flex mb-3 align-items-center">
-            <form method="get" class="d-inline me-2" style="display: flex; align-items: center;">
-                <label for="filterDays" class="me-1 fw-semibold">Filter:</label>
-                <select name="days" id="filterDays" class="form-select d-inline w-auto"
-                        onchange="this.form.submit()" style="margin:0;">
-                    <option value="" {% if not filter_days %}selected{% endif %}>Semua Hari</option>
-                    <option value="1" {% if filter_days == '1' %}selected{% endif %}>1 Hari Terakhir</option>
-                    <option value="3" {% if filter_days == '3' %}selected{% endif %}>3 Hari Terakhir</option>
-                    <option value="7" {% if filter_days == '7' %}selected{% endif %}>7 Hari Terakhir</option>
-                </select>
-            </form>
+            <form method="get" class="d-flex mb-3 align-items-center" style="gap: 10px;">
+            <label for="filterDays" class="fw-semibold mb-0">Filter:</label>
+            <select name="days" id="filterDays" class="form-select w-auto"
+                    onchange="this.form.submit()" style="margin:0;">
+                <option value="" {% if not filter_days %}selected{% endif %}>Semua Hari</option>
+                <option value="1" {% if filter_days == '1' %}selected{% endif %}>1 Hari Terakhir</option>
+                <option value="3" {% if filter_days == '3' %}selected{% endif %}>3 Hari Terakhir</option>
+                <option value="7" {% if filter_days == '7' %}selected{% endif %}>7 Hari Terakhir</option>
+            </select>
 
-            <!-- Filter Penyakit -->
-            <form method="get" class="d-inline" style="display: flex; align-items: center;">
-                <select name="disease" id="filterDisease" class="form-select d-inline w-auto"
-                        onchange="this.form.submit()" style="margin:0;">
-                    <option value="" {% if not filter_disease %}selected{% endif %}>Semua Penyakit</option>
-                    {% for disease in disease_list %}
-                        <option value="{{ disease }}" {% if filter_disease == disease %}selected{% endif %}>{{ disease }}</option>
-                    {% endfor %}
-                </select>
-            </form>
+            <select name="disease" id="filterDisease" class="form-select w-auto"
+                    onchange="this.form.submit()" style="margin:0;">
+                <option value="" {% if not filter_disease %}selected{% endif %}>Semua Penyakit</option>
+                {% for key, name in disease_list %}
+                    <option value="{{ key }}" {% if filter_disease == key %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </form>
         </div>
         
         {% if img %}
@@ -68,8 +65,14 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-center text-muted mt-4">Belum ada gambar yang diunggah.</p>
+            <p class="text-center text-white mt-4">Belum ada gambar yang diunggah.</p>
+            <div class="text-center mt-3">
+                <a href="{% url 'upload' %}" class="btn px-4 py-2 fw-bold" style="background-color: #f29877;">
+                    Upload Gambar
+                </a>
+            </div>
         {% endif %}
+
     </div>
 
 

@@ -25,10 +25,10 @@ from datetime import timedelta
 
 # Mapping nama kelas → deskripsi, treatment, dan prevention
 disease_info = {
-    'Anthracnose': {
-        'name': 'Anthracnose',
+    'Antraknosa': {
+        'name': 'Antraknosa',
         'description': (
-            'Penyakit Anthracnose pada tanaman biasanya ditandai dengan munculnya '
+            'Penyakit Antraknosa pada tanaman biasanya ditandai dengan munculnya '
             'bintik‐bintik hitam atau bolong pada daun akibat infeksi jamur. Daun akan '
             'tampak “mata ikan” dan mudah rontok jika tidak diatasi.'
         ),
@@ -45,10 +45,10 @@ disease_info = {
             '- Perbaiki sistem drainase agar media tanam tidak tergenang.'
         )
     },
-    'Leaf Spot': {
-        'name': 'Leaf Spot',
+    'Bercak Daun': {
+        'name': 'Bercak Daun',
         'description': (
-            'Leaf Spot disebabkan oleh beberapa jenis jamur/bakteri, menimbulkan bercak cokelat '
+            'Bercak Daun disebabkan oleh beberapa jenis jamur/bakteri, menimbulkan bercak cokelat '
             'atau hitam di permukaan daun. Jika parah, daun mengering dan rontok.'
         ),
         'treatment': (
@@ -63,10 +63,10 @@ disease_info = {
             '- Pastikan drainase lapang baik agar media tanam tidak lembap berlebihan.'
         )
     },
-    'Leaf Curl': {
-        'name': 'Leaf Curl',
+    'Keriting Daun': {
+        'name': 'Keriting Daun',
         'description': (
-            'Leaf Curl adalah gejala daun keriting pada cabai, umumnya disebabkan oleh virus '
+            'Keriting Daun adalah gejala daun keriting pada cabai, umumnya disebabkan oleh virus '
             'yang ditularkan oleh kutu daun atau vektor serupa. Daun menjadi kerdil dan '
             'pertumbuhan tanaman terhambat.'
         ),
@@ -82,8 +82,8 @@ disease_info = {
             '- Isolasi tanaman baru: tanam di lokasi terpisah atau periksa gejala sebelum dimasukkan ke kebun.'
         )
     },
-    'Fuscharium': {
-        'name': 'Fusarium Wilt',
+    'Fusarium': {
+        'name': 'Fusarium',
         'description': (
             'Fusarium wilt (Fusarium oxysporum) menyebabkan batang layu dari pangkal, daun '
             'menguning, dan akhirnya mati. Infeksi terjadi melalui akar yang terkontaminasi jamur.'
@@ -100,7 +100,7 @@ disease_info = {
             '- Pengapuran tanah: aplikasikan kapur pertanian untuk menaikkan pH (± 6,5–7).'
         )
     },
-    'Healthy': {
+    'Sehat': {
         'name': 'Sehat',
         'description': (
             'Tanaman tampak sehat, tidak ada gejala penyakit atau hama. Daun hijau segar, batang kokoh.'
@@ -115,8 +115,8 @@ disease_info = {
             '- Cek tanaman secara berkala, segera ambil tindakan bila ada gejala awal penyakit atau hama.'
         )
     },
-    'Bug': {
-        'name': 'Serangan Hama (Bug)',
+    'Serangga': {
+        'name': 'Serangan Hama',
         'description': (
             'Serangan hama seperti ulat, lalat buah, kutu putih, kutu hitam menyebabkan daun '
             'atau buah rusak, berlubang, dan kondisi tanaman melemah.'
@@ -133,8 +133,8 @@ disease_info = {
             '- Sanitasi buah/daun terinfeksi: buang buah yang ada ulat di dalamnya dan daun penuh kutu.'
         )
     },
-    'Yellowish': {
-        'name': 'Kuning (Yellowish)',
+    'Penyakit Kuning': {
+        'name': 'Kuning Daun',
         'description': (
             'Daun menguning bisa disebabkan oleh kekurangan nutrisi (klorosis) atau infeksi virus '
             '(sering disebut penyakit kuning/bule). Jika virus, biasanya berasal dari benih atau vektor.'
@@ -169,7 +169,7 @@ output_details = interpreter.get_output_details()
 '''
 
 # Mapping hasil prediksi ke nama penyakit
-disease_classes = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healthy', 'Bug', 'Yellowish']
+disease_classes = ['Antraknosa', 'Bercak Daun', 'Keriting Daun', 'Fusarium', 'Sehat', 'Serangga', 'Penyakit Kuning']
 
 # Fungsi yang dipanggil ke URLS
 
@@ -178,26 +178,21 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('/signin')
 
-    # Ambil semua gambar milik user
     images = UploadedImage.objects.filter(user=request.user)
     total = images.count()
-    
-    # Ambil 4 gambar terbaru
     recent_images = images.order_by('-uploaded_at')[:3]
 
-    # Definisikan labels chart
-    labels = ['Anthracnose', 'Leaf Spot', 'Leaf Curl', 'Fuscharium', 'Healthy', 'Bug', 'Yellowish']
-    values = []
+    # Ambil daftar penyakit yang pernah diupload user ini (distinct)
+    labels = list(images.values_list('disease_name', flat=True).distinct())
 
-    # Hitung persentase per label
+    values = []
     for label in labels:
-        count = images.filter(disease_name__startswith=label).count()
+        count = images.filter(disease_name__iexact=label).count()
         if total > 0:
             values.append(round(count / total * 100, 2))
         else:
             values.append(0)
 
-    # Siapkan context untuk template
     context = {
         'img': images,
         'recent_images': recent_images,
@@ -315,32 +310,23 @@ def delete(request, image_id):
 
 # Fungsi untuk mengambil halaman history
 def history(request):
-    # Ambil parameter filter dari query string
-    filter_days = request.GET.get('days')  # Contoh: '1', '3', '7'
-    filter_disease = request.GET.get('disease')  # Contoh: 'Anthracnose'
+    filter_days = request.GET.get('days')
+    filter_disease = request.GET.get('disease')
 
     images = UploadedImage.objects.filter(user=request.user)
 
-    # Filter berdasarkan hari
     if filter_days and filter_days.isdigit():
         days = int(filter_days)
         cutoff_date = timezone.now() - timedelta(days=days)
         images = images.filter(uploaded_at__gte=cutoff_date)
 
-    # Filter berdasarkan penyakit dengan case-insensitive exact match
     if filter_disease and filter_disease != '':
         images = images.filter(disease_name__iexact=filter_disease)
 
     images = images.order_by('-uploaded_at')
 
-    # Ambil daftar penyakit unik milik user untuk dropdown filter, urut alfabet
-    disease_list = (
-        UploadedImage.objects
-        .filter(user=request.user)
-        .values_list('disease_name', flat=True)
-        .distinct()
-        .order_by('disease_name')
-    )
+    # Ambil semua penyakit dari disease_info, format (key, name)
+    disease_list = [(key, disease_info[key]['name']) for key in sorted(disease_info.keys())]
 
     context = {
         'img': images,
@@ -351,16 +337,15 @@ def history(request):
 
     return render(request, 'history.html', context)
 
-
 # Fungsi untuk mengambil halaman detail
 def detail(request, image_id):
     # Ambil objek UploadedImage milik user
     image_obj = get_object_or_404(UploadedImage, id=image_id, user=request.user)
 
-    # Contoh value image_obj.disease_name: "Anthracnose (95.34%)"
+    # Contoh value image_obj.disease_name: "Antraknosa (95.34%)"
     raw_name = image_obj.disease_name
     # Potong label hingga sebelum " ("
-    label = raw_name.rsplit(' (', 1)[0]  # → "Anthracnose"
+    label = raw_name.rsplit(' (', 1)[0]  # → "Antraknosa"
 
     # Ambil info dari mapping, jika tidak ditemukan, pakai fallback generic
     info = disease_info.get(label, {
