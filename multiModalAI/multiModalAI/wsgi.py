@@ -1,16 +1,18 @@
 """
-WSGI config for multiModalAI project.
+Konfigurasi WSGI untuk proyek multiModalAI.
 
-It exposes the WSGI callable as a module-level variable named ``application``.
+File ini menyediakan objek WSGI yang bernama `application`,
+yang digunakan oleh server seperti Gunicorn atau uWSGI
+untuk menjalankan proyek Django ini.
 
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
+Dokumentasi: https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 """
 
 import os
-
 from django.core.wsgi import get_wsgi_application
 
+# Menetapkan modul settings default untuk proyek ini
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "multiModalAI.settings")
 
+# Membuat instance aplikasi WSGI
 application = get_wsgi_application()

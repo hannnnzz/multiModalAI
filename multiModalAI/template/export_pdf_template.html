@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <title>Riwayat Deteksi</title>
     <style>
@@ -18,14 +19,14 @@
 <body>
     <h2>📄 Riwayat Deteksi Penyakit Cabai</h2>
 
-    <!-- Siluet Gambar -->
+    <!--Siluet Gambar-->
     <div class="siluet">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Chili_pepper.png" alt="Siluet Cabai">
+        <img src="{% static 'media/chili.ico' %}" alt="Siluet Cabai">
     </div>
 
     <p>User: <strong>{{ user.username }}</strong></p>
 
-    <!-- Tabel Riwayat Deteksi (Dikombinasikan dengan Rekomendasi Perawatan) -->
+    <!--Tabel Riwayat Deteksi (Dikombinasikan dengan Rekomendasi Perawatan)-->
     <table>
         <thead>
             <tr>

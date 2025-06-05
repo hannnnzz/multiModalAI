@@ -7,7 +7,7 @@
 
     {% include 'fragments/navbar.html' %}
 
-    <!-- HISTORY DETAIL -->
+    <!-- History Detail -->
     <div class="container mt-5">
         <h2 class="text-center text-white fw-bold">Detail Gambar</h2>
 
@@ -15,7 +15,7 @@
             <div class="col-12 col-sm-10 col-md-8 col-lg-6">
                 <div class="card shadow-lg p-4" style="background-color: #f29877; border-radius: 10px;">
                     
-                    <!-- Gambar tampil sesuai ukuran aslinya -->
+                    <!-- Gambar Tampil Sesuai Ukuran Aslinya -->
                     <img src="{{ image.pic.url }}" class="card-img-top mb-3 img-fluid" alt="Uploaded Image" style="height: auto; width: 100%;">
 
                     <div class="card-body">
@@ -35,8 +35,7 @@
 
                         <div class="mt-3">
                             <span class="fw-bold text-grey">Cara Pencegahan:</span>
-                            <pre class="text-grey" style="white-space: pre-wrap; font-family: inherit;">
-{{ info.prevention }}</pre>
+                            <pre class="text-grey" style="white-space: pre-wrap; font-family: inherit;">{{ info.prevention }}</pre>
                         </div>
 
                         <div class="text-center mt-4">

@@ -8,7 +8,7 @@
     {% include 'fragments/navbar.html' %}  <!-- Potongan kode navbar -->
 
 
-    <!-- RIWAYAT DETEKSI -->
+    <!-- Riwayat Deteksi -->
     <div class="container mt-5">  
         <h2 class="text-center fw-bold mb-4">Riwayat Deteksi</h2> 
         
@@ -24,6 +24,7 @@
                 <option value="7" {% if filter_days == '7' %}selected{% endif %}>7 Hari Terakhir</option>
             </select>
 
+            <!-- Filter Penyakit-->
             <select name="disease" id="filterDisease" class="form-select w-auto"
                     onchange="this.form.submit()" style="margin:0;">
                 <option value="" {% if not filter_disease %}selected{% endif %}>Semua Penyakit</option>

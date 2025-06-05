@@ -1,45 +1,45 @@
 <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #f29877;">
-  <!-- Potongan Kode Header -->
+  <!--Potongan Kode Header-->
   <div class="container-fluid">
-    <!-- Container Full Width-->
+    <!--Container Full Width-->
     <a class="navbar-brand fw-bold" href="{% url 'home' %}" style="color: #2f3273 !important;">
       Chili AI
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <!-- Tombol Toggler untuk Tampilan Mobile -->
+      <!--Tombol Toggler untuk Tampilan Mobile-->
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-      <!-- Bagian Menu yang Akan Collapse di Mobile -->
+      <!--Bagian Menu yang Akan Collapse di Mobile-->
       <ul class="navbar-nav ms-auto fw-semibold">
-        <!-- Daftar Item Navigasi -->
+        <!--Daftar Item Navigasi-->
         <li class="nav-item">
-          <!-- Link Dashboard -->
+          <!--Link Dashboard-->
           <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"
              href="{% url 'home' %}">Dashboard</a>
         </li>
         <li class="nav-item">
-          <!-- Link Halaman Upload Gambar -->
+          <!--Link Halaman Upload Gambar-->
           <a class="nav-link {% if request.resolver_match.url_name == 'upload' %}active{% endif %}"
              href="{% url 'upload' %}">Upload Gambar</a>
         </li>
         <li class="nav-item">
-          <!-- Link Riwayat Deteksi -->
+          <!--Link Riwayat Deteksi-->
           <a class="nav-link {% if request.resolver_match.url_name == 'history' %}active{% endif %}"
              href="{% url 'history' %}">Riwayat Deteksi</a>
         </li>
         <li class="nav-item">
-          <!-- Link Ekspor Data ke PDF -->
+          <!--Link Ekspor Data ke PDF-->
           <a class="nav-link {% if request.resolver_match.url_name == 'export_pdf' %}active{% endif %}"
              href="{% url 'export_pdf' %}">Ekspor Data</a>
         </li>
         <li class="nav-item d-flex align-items-center">
-          <!-- Menampilkan Username Pengguna yang Sedang Login -->
+          <!--Menampilkan Username Pengguna yang Sedang Login-->
           <span class="nav-link text-muted">👤 {{ request.user.username }}</span>
         </li>
         <li class="nav-item">
-          <!-- Tombol Logout -->
+          <!--Tombol Logout-->
           <a class="btn btn-danger text-white fw-bold ms-2" href="/signout/">Logout</a>
         </li>
       </ul>

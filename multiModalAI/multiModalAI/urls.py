@@ -1,36 +1,47 @@
 """
-URL configuration for multiModalAI project.
+Konfigurasi URL untuk proyek multiModalAI.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+`urlpatterns` digunakan untuk mengarahkan URL ke fungsi view.
+Dokumentasi: https://docs.djangoproject.com/en/5.1/topics/http/urls/
 """
+
 from django.contrib import admin
 from django.urls import path
-from multiModalAIApp.views import *
 from django.conf import settings
 from django.conf.urls.static import static
+from multiModalAIApp.views import (
+    home, signin, signout, signup,
+    upload, history, export_pdf,
+    detail, delete,
+)
 
-# Path URL untuk aplikasi
+# Daftar URL utama aplikasi
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('home/',home, name="home"),
-    path('',home),
-    path('signin/',signin, name="login"),
-    path('signout/',signout),
-    path('signup/',signup, name="signup"),
-    path('upload/', upload, name="upload"),
-    path('history/', history, name="history"),
+
+    # Halaman utama
+    path('', home, name='home'),
+    path('home/', home, name='home'),
+
+    # Autentikasi pengguna
+    path('signin/', signin, name='login'),
+    path('signout/', signout, name='logout'),
+    path('signup/', signup, name='signup'),
+
+    # Fitur aplikasi
+    path('upload/', upload, name='upload'),
+    path('history/', history, name='history'),
     path('export/', export_pdf, name='export_pdf'),
-    path('detail/<int:image_id>/', detail, name="detail"),
+    path('detail/<int:image_id>/', detail, name='detail'),
     path('delete/<int:image_id>/', delete, name='delete'),
-] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+]
+
+# Penanganan file media selama pengembangan
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Tambahan konfigurasi untuk produksi (jika DEBUG = False)
+if not settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Tambahkan custom error page jika diperlukan
+# handler404 = 'multiModalAIApp.views.custom_404_view'

@@ -1,29 +1,30 @@
 import os
+import locale
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
-import tensorflow as tf
 import base64
-import datetime
+from datetime import timedelta, datetime, time
 from io import BytesIO
+from collections import OrderedDict, Counter
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
+from calendar import month_name
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
-from django.contrib.auth import login,logout,authenticate
 from django.contrib import messages
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.loader import get_template
+from django.utils import timezone
+from django.core.files.storage import FileSystemStorage, default_storage
+from django.utils.timezone import now as dj_now
 from xhtml2pdf import pisa
 from .models import UploadedImage
-from django.core.files.storage import FileSystemStorage
-from django.core.files.storage import default_storage
-from django.contrib.auth import authenticate, login
-from django.utils import timezone
-from datetime import timedelta
 
-# Mapping nama kelas → deskripsi, treatment, dan prevention
+
+# Mapping Nama Kelas → Deskripsi, Treatment, dan Prevention
 disease_info = {
     'Antraknosa': {
         'name': 'Antraknosa',
@@ -152,12 +153,12 @@ disease_info = {
     },
 }
 
-# Load model sekali di awal
+# Load Model CNN
 
 model_path = os.path.join(settings.BASE_DIR, 'model', 'model_mobilenettv.h5')  
 model = load_model(model_path)
 
-'''
+''' # Load Model TFLite (Deployment)
 # path ke .tflite
 tflite_model_path = os.path.join(settings.BASE_DIR, 'model', 'model_mobilenettv.tflite')
 interpreter = tf.lite.Interpreter(model_path=tflite_model_path)
@@ -168,43 +169,130 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 '''
 
-# Mapping hasil prediksi ke nama penyakit
+# Mapping Hasil Prediksi ke Nama Penyakit
 disease_classes = ['Antraknosa', 'Bercak Daun', 'Keriting Daun', 'Fusarium', 'Sehat', 'Serangga', 'Penyakit Kuning']
 
-# Fungsi yang dipanggil ke URLS
+# Set Locale ke Bahasa Indonesia Supaya Nama Hari dan Bulannya Bahasa Indonesia
+try:
+    locale.setlocale(locale.LC_TIME, 'id_ID.UTF-8')  # Linux/MacOS
+except locale.Error:
+    try:
+        locale.setlocale(locale.LC_TIME, 'Indonesian_indonesia.1252')  # Windows
+    except locale.Error:
+        pass  # Apabila gagal ke default (Bahasa Inggris)
 
-# Fungsi untuk mengambil halaman utama
+# Helper Konversi Tanggal String 'YYYY-MM-DD' Menjadi Nama Hari Bahasa Indonesia
+def get_day_name(date_str):
+    dt = datetime.strptime(date_str, '%Y-%m-%d')
+    return dt.strftime('%A')  # Contoh: 'Senin', 'Selasa', dst
+
+# Helper Untuk Mengubah Angka Bulan ke Nama Bulan Indonesia
+def get_month_name(month_num):
+    dt = datetime(2000, month_num, 1)
+    return dt.strftime('%B')  # Contoh: 'Januari', 'Februari', dst
+
+# Fungsi Untuk Mengambil Halaman Utama
 def home(request):
     if not request.user.is_authenticated:
         return redirect('/signin')
 
+    # Ambil 3 Gambar Terbaru yang diupload Oleh User
     images = UploadedImage.objects.filter(user=request.user)
     total = images.count()
     recent_images = images.order_by('-uploaded_at')[:3]
 
-    # Ambil daftar penyakit yang pernah diupload user ini (distinct)
-    labels = list(images.values_list('disease_name', flat=True).distinct())
+    # Hitung Upload per Hari Selama 7 Hari Terakhir
+    today = timezone.now().date()
+    days_range = [today - timedelta(days=i) for i in range(6, -1, -1)]
 
-    values = []
-    for label in labels:
-        count = images.filter(disease_name__iexact=label).count()
-        if total > 0:
-            values.append(round(count / total * 100, 2))
-        else:
-            values.append(0)
+    # OrderedDict untuk menyimpan jumlah upload per hari
+    uploads_per_day = OrderedDict()
+    for day in days_range:
+        start_dt = timezone.make_aware(datetime.combine(day, time.min))
+        end_dt = timezone.make_aware(datetime.combine(day, time.max))
+        count = images.filter(uploaded_at__range=(start_dt, end_dt)).count()
+        uploads_per_day[day.strftime('%Y-%m-%d')] = count
 
+    total_uploads_last_7_days = sum(uploads_per_day.values())
+
+    # Hitung Jumlah Kemunculan Setiap disease_name
+    raw_labels = list(images.values_list('disease_name', flat=True))
+    disease_counter = Counter(name for name in raw_labels if name)
+
+    # Pie Chart: Persentase tiap Penyakit
+    labels = list(disease_counter.keys())
+    values = [
+        round((disease_counter[label] / total) * 100, 2) if total > 0 else 0
+        for label in labels
+    ]
+
+    # Bar Chart: Jumlah Deteksi tiap Penyakit
+    bar_labels = labels
+    bar_counts = [disease_counter[label] for label in bar_labels]
+
+    # Ringkasan Bulanan
+    now = timezone.now()
+    current_month = now.month
+    current_year = now.year
+    month_display = get_month_name(current_month)
+
+    # Menggunakan Filter untuk Mendapatkan Gambar yang diupload pada Bulan dan Tahun Ini
+    monthly_images = images.filter(uploaded_at__month=current_month, uploaded_at__year=current_year)
+    monthly_total = monthly_images.count()
+
+    # Hitung Jumlah Penyakit yang Terdeteksi pada Bulan ini
+    monthly_raw_labels = list(monthly_images.values_list('disease_name', flat=True))
+    monthly_counter = Counter(name for name in monthly_raw_labels if name)
+    monthly_disease_count = sum(monthly_counter.values())
+
+    # Ambil 3 Penyakit Paling Umum pada Bulan Ini
+    top_3 = monthly_counter.most_common(3)
+    top_3_data = [
+        {
+            'name': name,
+            'percentage': round((count / monthly_disease_count) * 100, 2) if monthly_disease_count else 0
+        }
+        for name, count in top_3
+    ]
+
+    # Hitung Hari Paling Aktif dan Paling Sepi Upload, Dalam Bentuk Nama Hari Bahasa Indonesia
+    most_active_day_date = max(uploads_per_day.items(), key=lambda x: x[1])[0] if uploads_per_day else None
+    least_active_day_date = min(uploads_per_day.items(), key=lambda x: x[1])[0] if uploads_per_day else None
+
+    most_active_day = get_day_name(most_active_day_date) if most_active_day_date else '—'
+    least_active_day = get_day_name(least_active_day_date) if least_active_day_date else '—'
+
+    # Siapkan Context untuk Render Template
     context = {
         'img': images,
         'recent_images': recent_images,
+        'uploads_per_day_keys': list(uploads_per_day.keys()),
+        'uploads_per_day_values': list(uploads_per_day.values()),
+        'total_uploads_last_7_days': total_uploads_last_7_days,
         'chart_data': {
             'labels': labels,
             'values': values,
+        },
+        'bar_chart_data': {
+            'labels': bar_labels,
+            'values': bar_counts,
+        },
+        'monthly_summary': { 
+            'now': dj_now(),
+            'month': month_display,
+            'total_upload': monthly_total,
+            'disease_detected': monthly_disease_count,
+            'most_common': top_3_data[0]['name'] if top_3_data else '—',
+            'top_diseases': top_3_data,
+            'most_active_day': most_active_day,
+            'least_active_day': least_active_day,
         }
     }
+
     return render(request, 'home.html', context)
 
-# Fungsi untuk mengambil halaman login
-# Jika sudah login, redirect ke home
+# Fungsi Untuk Mengambil Halaman Login
+# Jika Sudah Login, Redirect ke Home
 def signin(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -223,13 +311,13 @@ def signin(request):
 
         return render(request, "login.html")
 
-# Fungsi untuk mengambil halaman signout
-# Jika sudah logout, redirect ke login
+# Fungsi Untuk Mengambil Halaman Signout
+# Jika Sudah Logout, Redirect ke Login
 def signout(request):
     logout(request)
     return redirect('/signin')
 
-# Fungsi untuk mengambil halaman signup
+# Fungsi Untuk Mengambil Halaman Signup
 def signup(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -252,80 +340,76 @@ def signup(request):
 
     return render(request, "signup.html")
 
-# Fungsi untuk mengambil halaman upload
-# Jika sudah upload, redirect ke history
+# Fungsi Untuk Mengambil Halaman Upload
+# Jika Sudah Upload, Redirect ke History
+ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.bmp', '.webp']
 def upload(request):
     if request.method == 'POST' and request.FILES.get('pic'):
         image_file = request.FILES['pic']
+
+        # Cek Ekstensi File
+        ext = os.path.splitext(image_file.name)[1].lower()
+        if ext not in ALLOWED_IMAGE_EXTENSIONS:
+            messages.error(request, "Format file tidak didukung. Harap upload file gambar (JPG, PNG, BMP, dll).")
+            return redirect('/upload')  # atau halaman upload kamu
+        
         fs = FileSystemStorage()
         filename = fs.save(image_file.name, image_file)
         file_path = fs.path(filename)
 
-        # Prediksi gambar
+        # Proses Prediksi Gambar
         img = image.load_img(file_path, target_size=(224, 224))  # Sesuaikan ukuran model kamu
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
-        img_array /= 255.0  # Normalisasi jika modelmu pakai itu
+        img_array /= 255.0  # Normalisasi ukuran
         
         prediction = model.predict(img_array)
         predicted_class = np.argmax(prediction)
-        
-        '''
-        # Set input tensor
-        interpreter.set_tensor(input_details[0]['index'], img_array.astype(input_details[0]['dtype']))
-        # Jalankan inference
-        interpreter.invoke()
-        # Ambil output
-        pred = interpreter.get_tensor(output_details[0]['index'])
-        predicted_class = np.argmax(pred)
-        confidence = np.max(pred) * 100
-        '''
-        
         disease_name = f"{disease_classes[predicted_class]}"
 
-
-        # Simpan ke database
+        # Simpan ke Database
         UploadedImage.objects.create(
             user=request.user,
             pic=filename,
             disease_name=disease_name
         )
+        
+        messages.success(request, "Upload dan prediksi berhasil!")
+        return redirect('/upload')
 
-        return redirect('/history')  # Redirect ke history
+    return render(request, 'upload.html')  # Redirect ke history
 
-    # Ambil semua gambar user saat ini, terbaru dulu
-    images = UploadedImage.objects.filter(user=request.user).order_by('-uploaded_at')
-    
-    return render(request, 'upload.html', {'img': images})
-
-# Fungsi untuk menghapus gambar
+# Fungsi Untuk Menghapus Gambar
 def delete(request, image_id):
     image = get_object_or_404(UploadedImage, id=image_id)
 
-    # Pastikan hanya pemilik gambar yang bisa menghapus (jika ingin fitur ini)
+    # Pastikan Hanya Pemilik Gambar yang Bisa Menghapus
     if request.user == image.user:
-        image.pic.delete()  # Hapus file dari sistem
-        image.delete()  # Hapus data dari database
+        image.pic.delete()  # Hapus File dari Sistem
+        image.delete()  # Hapus Data dari Database
     return redirect('/history')
 
-# Fungsi untuk mengambil halaman history
+# Fungsi Untuk Mengambil Halaman history
 def history(request):
     filter_days = request.GET.get('days')
     filter_disease = request.GET.get('disease')
 
     images = UploadedImage.objects.filter(user=request.user)
 
+    # Filter Berdasarkan Hari Terakhir diupload
     if filter_days and filter_days.isdigit():
         days = int(filter_days)
         cutoff_date = timezone.now() - timedelta(days=days)
         images = images.filter(uploaded_at__gte=cutoff_date)
 
+    # Filter Berdasarkan Nama Penyakit
     if filter_disease and filter_disease != '':
         images = images.filter(disease_name__iexact=filter_disease)
 
+    # Urutkan Berdasarkan Waktu Upload Terbaru
     images = images.order_by('-uploaded_at')
 
-    # Ambil semua penyakit dari disease_info, format (key, name)
+    # Ambil Semua Penyakit Dari disease_info, format (key, name)
     disease_list = [(key, disease_info[key]['name']) for key in sorted(disease_info.keys())]
 
     context = {
@@ -337,17 +421,16 @@ def history(request):
 
     return render(request, 'history.html', context)
 
-# Fungsi untuk mengambil halaman detail
+# Fungsi Untuk Mengambil Halaman detail
 def detail(request, image_id):
-    # Ambil objek UploadedImage milik user
+    # Ambil Objek UploadedImage Milik User
     image_obj = get_object_or_404(UploadedImage, id=image_id, user=request.user)
 
-    # Contoh value image_obj.disease_name: "Antraknosa (95.34%)"
+    # Ambil Nama Penyakit dari Objek
     raw_name = image_obj.disease_name
-    # Potong label hingga sebelum " ("
-    label = raw_name.rsplit(' (', 1)[0]  # → "Antraknosa"
+    label = raw_name.rsplit(' (', 1)[0]  
 
-    # Ambil info dari mapping, jika tidak ditemukan, pakai fallback generic
+    # Ambil Info dari Mapping, Jika Tidak Ditemukan, Pakai Fallback Generic
     info = disease_info.get(label, {
         'name': label,
         'description': 'Informasi belum tersedia.',
@@ -361,32 +444,45 @@ def detail(request, image_id):
     }
     return render(request, 'detail.html', context)
 
-# Fungsi untuk mengekspor PDF
+# Fungsi untuk Mengekspor PDF
 def export_pdf(request):
     images = UploadedImage.objects.filter(user=request.user).order_by('-uploaded_at')
 
-    # Konversi gambar ke base64
+    # Konversi Gambar ke base64 + Tambahkan Treatment
     for img in images:
+        # Convert Gambar ke base64
         img_path = os.path.join(settings.MEDIA_ROOT, img.pic.name)
         with default_storage.open(img_path, "rb") as image_file:
             img.base64 = base64.b64encode(image_file.read()).decode('utf-8')
 
+        # Tambahkan Rekomendasi Treatment Berdasarkan disease_name
+        img.treatment = disease_info.get(img.disease_name, {}).get(
+            'treatment', 'Belum ada rekomendasi.')
+
+    # Siapkan Template untuk PDF
     template_path = 'export_pdf_template.html'
     context = {
         'img': images,
         'user': request.user,
-        'export_date': datetime.datetime.now().strftime("%d %B %Y, %H:%M")
+        'export_date': datetime.now().strftime("%d %B %Y, %H:%M")
     }
 
+    # Render Template ke HTML
     template = get_template(template_path)
     html = template.render(context)
 
+    # Buat PDF dari HTML
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="Riwayat_Deteksi.pdf"'
 
+    # Gunakan xhtml2pdf untuk mengkonversi HTML ke PDF
     pisa_status = pisa.CreatePDF(html, dest=response)
     if pisa_status.err:
         return HttpResponse('Terjadi kesalahan saat membuat PDF', content_type='text/plain')
 
     return response
+
+# Fungsi untuk 404 Untuk Deployment
+#def custom_404_view(request, exception):
+#   return render(request, '404.html', status=404)
 

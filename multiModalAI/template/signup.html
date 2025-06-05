@@ -8,11 +8,13 @@
 
     <!-- Load CSS -->
     <link rel="stylesheet" href="{% static 'css/stylelog.css' %}">  <!-- Gaya khusus halaman login -->
+    <!--Ikon Favicon-->
+    <link rel="icon" href="{% static 'media/chili.ico' %}" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300&family=Poppins:wght@900&display=swap" rel="stylesheet">  <!-- Font Google Montserrat & Poppins -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">  <!-- Ikon Font Awesome -->
 </head>
 <body>
-    <!-- MESSAGE HANDLER -->
+    <!--Handler Message-->
     {% if messages %}  
     <div class="alert-container">
         {% for message in messages %}  
@@ -24,7 +26,7 @@
     </div>
     {% endif %}
 
-    <!-- REGIST FORM -->
+    <!--Form Registrasi-->
     <div class="wrapper">  
         <div class="circle circle1"></div>  
         <div class="circle circle2"></div>  
@@ -32,24 +34,24 @@
             <h1 class="signup-center">Register Chili AI</h1>  
 
             <form action="{% url 'signup' %}" method="post" id="loginForm">  <!-- Form POST ke view 'signup' -->
-                {% csrf_token %}  <!-- Token keamanan CSRF Django -->
-                <input type="text" name="username" placeholder="Username" required>  <!-- Input username wajib -->
+                {% csrf_token %}  <!-- Token Keamanan CSRF Django -->
+                <input type="text" name="username" placeholder="Username" required>  <!-- Input Username Wajib -->
 
-                <!-- Password field dengan toggle visibility -->
+                <!-- Password Field dengan Toggle Visibility -->
                 <div class="input-wrapper">
                     <input id="password" type="password" name="password" placeholder="Password" required>  <!-- Input password wajib -->
                     <i class="fa-solid fa-eye toggle-password" data-target="password"></i>  <!-- Ikon toggle untuk menampilkan/menyembunyikan password -->
                 </div>
         
-                <!-- Confirm Password field dengan toggle visibility -->
+                <!-- Confirm Password Field dengan Toggle Visibility -->
                 <div class="input-wrapper">
                     <input id="confirmpassword" type="password" name="confirmpassword" placeholder="Confirm Password" required>  <!-- Input konfirmasi password wajib -->
                     <i class="fa-solid fa-eye toggle-password" data-target="confirmpassword"></i>  <!-- Ikon toggle untuk konfirmasi password -->
                 </div>
         
-                <button type="submit">Register</button>  <!-- Tombol submit form -->
+                <button type="submit">Register</button>  <!-- Tombol Submit Form -->
                 <div class="signup-center">
-                    <a href="{% url 'login' %}">Sign In</a>  <!-- Link ke halaman login -->
+                    <a href="{% url 'login' %}">Sign In</a>  <!-- Link ke Halaman Login -->
                 </div>
             </form>
         </div>

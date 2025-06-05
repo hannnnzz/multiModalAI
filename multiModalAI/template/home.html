@@ -10,7 +10,12 @@
 
     <!-- Baru-baru ini kamu upload -->
     <div class="container mt-5">  
-        <h4 class="fw-bold text-white">Baru-baru ini kamu upload:</h4>
+        <h4 class="fw-bold text-white d-flex justify-content-between align-items-center">
+            Baru-baru ini kamu upload:
+            {% if img %}
+            <span class="fw-normal fs-6 text-end text-white fw-semibold">Total Data Kamu Sekarang ada {{ img|length }} Data</span>
+            {% endif %}
+        </h4>
         {% if recent_images %}
             <div class="row g-4 justify-content-center mt-3">
                 {% for image in recent_images %}
@@ -44,36 +49,91 @@
     </div>
 
 
-    <!-- Chart hanya ditampilkan jika ada data -->
-    <div class="container" style="margin-top: 3rem;">
-        <h3 class="fw-bold text-center">Distribusi Penyakit Tanaman</h3>
+    <!-- Statistik Penyakit Tanaman (Pie & Bar Chart) -->
+    <h3 class="fw-bold text-center mt-5">Statistik Penyakit Tanaman</h3> <!--Pie Chart-->
+    {% if chart_data.labels or bar_chart_data.labels %}
+    <div class="container mt-5">
         <div class="row justify-content-center">
-            <div class="col-md-6 text-center text-white">
             {% if chart_data.labels %}
-                <canvas id="diseaseChart"></canvas>
-            {% else %}
-                <p class="mt-4">Belum ada data penyakit untuk ditampilkan.</p>
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <h5 class="fw-semibold mb-3 text-white">Distribusi (%)</h5>
+                <div class="chart-wrapper" style="width: 100%; max-width: 400px; height: 350px;">
+                    <canvas id="diseaseChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if bar_chart_data.labels %} <!--Bar Chart --> 
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <h5 class="fw-semibold mb-3 text-white">Jumlah Deteksi</h5>
+                <div class="chart-wrapper" style="width: 100%; max-width: 400px; height: 350px;">
+                    <canvas id="barChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
             {% endif %}
         </div>
+    </div>
+    {% else %}
+    <div class="container mt-5 text-center text-white">
+        <p class="mt-4">Belum ada data penyakit untuk ditampilkan.</p>
+    </div>
+    {% endif %}
+
+    <!-- Upload Terakhir & Rekap Bulanan -->
+    <div class="container mt-5">
+        <div class="row">
+            <!-- Kiri: Chart Upload Per Hari -->
+            <div class="col-md-6 mb-4">
+                <div class="rounded p-4">
+                    <h3 class="fw-bold text-white text-center mb-4">Jumlah Upload 7 Hari Terakhir</h3>
+                    {% if total_uploads_last_7_days == 0 %}
+                        <p class="text-center">Kamu belum upload gambar apapun.</p>
+                    {% else %}
+                        <canvas id="uploadPerDayChart" style="width:100%; height:300px;"></canvas>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Kanan: Ringkasan Bulanan -->
+            <div class="col-md-6 mb-4">
+                <div class="text-white rounded p-4 h-100">
+                    <h4 class="mb-3 fw-bold text-center">Ringkasan Bulanan - {{ monthly_summary.month }} {{ now.year }}</h4>
+                    {% if monthly_summary.total_upload == 0 %}
+                        <p class="text-center">Kamu belum upload gambar apapun.</p>
+                    {% else %}
+                        <p class="text-center"><strong>Penyakit Terbanyak:</strong> {{ monthly_summary.most_common }}</p>
+                        <hr class="border-secondary">
+                        <p><strong>Top 3 Penyakit:</strong></p>
+                        <ol>
+                            {% for item in monthly_summary.top_diseases %}
+                                <li>{{ item.name }} <span style="color: white;">({{ item.percentage }}%)</span></li>
+                            {% endfor %}
+                        </ol>
+                        <hr class="border-secondary">
+                        <p class="text-center"><strong>Hari Teraktif Upload:</strong> {{ monthly_summary.most_active_day }}</p>
+                        <p class="text-center"><strong>Hari Sepi Upload:</strong> {{ monthly_summary.least_active_day }}</p>
+                    {% endif %}
+                    
+                </div>
+            </div>
         </div>
     </div>
+
 
 
     {% include 'fragments/footer.html' %}
 
 </body>
+
     <script>
-        // Ambil konteks canvas
-        const ctx = document.getElementById('diseaseChart')?.getContext('2d');
-
-        // Render hanya jika canvas-nya ada di halaman
-        if (ctx) {
-            // Data dari views.py
-            const labels = {{ chart_data.labels|safe }};
-            const values = {{ chart_data.values|safe }};
-
-            // Opsi warna; kalau mau, sesuaikan paletmu sendiri
-            const colors = [
+    document.addEventListener('DOMContentLoaded', function () {
+        // PIE CHART: Persentase Penyakit
+        const pieCanvas = document.getElementById('diseaseChart');
+        if (pieCanvas) {
+            const pieCtx = pieCanvas.getContext('2d');
+            const pieLabels = {{ chart_data.labels|safe }};
+            const pieValues = {{ chart_data.values|safe }};
+            const pieColors = [
                 'rgba(255, 99, 132, 0.7)',
                 'rgba(54, 162, 235, 0.7)',
                 'rgba(255, 206, 86, 0.7)',
@@ -83,20 +143,20 @@
                 'rgba(199, 199, 199, 0.7)'
             ];
 
-            // Buat chart (pie chart)
-            new Chart(ctx, {
+            new Chart(pieCtx, {
                 type: 'pie',
                 data: {
-                    labels: labels,
+                    labels: pieLabels,
                     datasets: [{
-                        data: values,
-                        backgroundColor: colors,
+                        data: pieValues,
+                        backgroundColor: pieColors,
                         borderColor: 'black',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             position: 'bottom',
@@ -113,6 +173,96 @@
                 }
             });
         }
+
+        // BAR CHART: Jumlah Deteksi per Penyakit
+        const barCanvas = document.getElementById('barChart');
+        if (barCanvas) {
+            const barCtx = barCanvas.getContext('2d');
+            const barLabels = {{ bar_chart_data.labels|safe }};
+            const barValues = {{ bar_chart_data.values|safe }};
+
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: barLabels,
+                    datasets: [{
+                        label: 'Jumlah Deteksi',
+                        data: barValues,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'black',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Jumlah Deteksi Tiap Penyakit',
+                            color: 'white'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                color: 'white',
+                                callback: function (value) {
+                                    return Math.floor(value);
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: { color: 'white' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // BAR CHART: Upload per Hari
+        const uploadCanvas = document.getElementById('uploadPerDayChart');
+        if (uploadCanvas) {
+            const uploadCtx = uploadCanvas.getContext('2d');
+            const uploadLabels = {{ uploads_per_day_keys|safe }};
+            const uploadData = {{ uploads_per_day_values|safe }};
+
+            new Chart(uploadCtx, {
+                type: 'bar',
+                data: {
+                    labels: uploadLabels,
+                    datasets: [{
+                        label: 'Jumlah Upload',
+                        data: uploadData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        borderRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: 'white' }
+                        },
+                        x: {
+                            ticks: { color: 'white' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    }
+                }
+            });
+        }
+    });
     </script>
+
 
 </html>
